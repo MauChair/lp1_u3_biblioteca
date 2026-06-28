@@ -69,72 +69,101 @@ public:
 
 
     void lendItem(string  idPerson, string idItem , int days) {
+        bool userExists = false;
+        bool itemExists = false;
+
+        int userIndex = 0;
+        int itemIndex = 0;
         
-        for(int d = 0 ; d < users.size() ; d++){
-            
-            if( users[d].id == idPerson ){
-                
-                for(int c = 0 ; c < items.size() ; c++){
-                    
-                    if( items[c].id == idItem ){
-                        
-                        if (items[c].status == AVAILABLE) {
-                            items[c].responsibleId = users[d].id;
-                            items[c].status = BORROWED;
-                            cout << "Item " << items[c].name << " (" << items[c].id
-                            << ") emprestado a " << users[d].name << "\n\n";
-                        } else {
-                            cout << "Item " << items[c].name << " (" << items[c].id
-                            << ") Não disponível para empréstimo \n\n";
-                        }
-                    }
-                }
-        
-            
-                
+        for(int d = 0 ; d <users.size() ; d++){
+            if(users[d].id == idPerson) {
+                userExists = true;
+                userIndex = d;
+                break;
             }
-       
         }
+
+        if(userExists = false){
+            cout << "Erro: usuário com ID " << idPerson << " não encontrado no sistema.\n\n";
+            return;
+        }
+
+        for(int c = 0 ; c < items.size(); c++){
+            if(items[c].id == idItem){
+                itemIndex = true;
+                itemIndex = c;
+                break;
+            }
+        }
+
+        if(itemExists = false){
+            cout << "Erro: item com ID " << idItem << " não encontrado no sistema.\n\n";
+            return;
+        }
+
+        if (items[itemIndex].status != AVAILABLE) {
+            cout << "Erro: o item " << items[itemIndex].name 
+             << " nao esta disponivel para emprestimo. ";
+            if (items[itemIndex].status == BORROWED) {
+                cout << "Ja esta emprestado \n\n";
+            } else {
+                cout << "Status: INDISPONIVEL\n\n";
+            }
+            return;
+        }
+
+        items[itemIndex].responsibleId = users[userIndex].id;
+        items[itemIndex].status = BORROWED;
+        cout << "Sucesso: item " << items[itemIndex].name << items[itemIndex].id << " emprestado a " << users[userIndex].name << " por " << days << " dias.\n\n";
     }
     
     void returnItem(string idPerson, string idItem, int days) {
-    bool userExists  = false; // Ver se existem antes de executar
-    bool itemExists = false; // Falta implementar !!!
+        bool userExists  = false; // Ver se existem antes de executar
+        bool itemExists = false; // Falta implementar !!!
     
-    for (int d = 0; d < users.size(); d++) {
+        int userIndex = 0;
+        int itemIndex = 0;
 
-        if (users[d].id == idPerson) {
-
-            for (int c = 0; c < items.size(); c++) {
-
-                if (items[c].id == idItem) {
-
-                    if (items[c].status == BORROWED) {
-
-                        if (items[c].responsibleId == idPerson) {
-
-                            items[c].responsibleId = "0";
-
-                            items[c].status = AVAILABLE;
-
-                            cout << "Item " << items[c].name
-                                 << " (" << items[c].id
-                                 << ") devolvido por " << users[d].name
-                                 << "\n\n";
-
-                        } else {
-                            cout << " esse usuário não pegou esse item emprestado\n\n";
-                        }
-
-                    } else {
-                        cout << "Item não foi emprestado \n\n";
-                    }
-                }
+        for(int d = 0 ; d < users.size(); d++){
+            if(users[d].id == idPerson){
+                userExists = true;
+                userIndex = d;
+                break;
             }
-        
         }
+
+        if(userExists = false){
+            cout << "Erro na devolução: usuário com ID " << idPerson << " não cadastrado.\n\n";
+            return;
+        }
+
+        for(int c = 0 ; c < items.size(); c++){
+            if(items[c].id == idItem){
+                itemExists = true;
+                itemIndex = c;
+                break;
+            }
+        }
+
+        if(itemExists = false){
+            cout << "Erro na devolução: item com ID " << idItem << "não cadastrado.\n\n";
+            return;
+        }
+
+        if(items[itemIndex].status != BORROWED){
+            cout << "Erro na devolução: item " << items[itemIndex].name << "não consta como emprestado no sistema.\n\n";
+            return;
+        }
+
+        if(items[itemIndex].responsibleId != idPerson){
+            cout << "Erro na devolução: O usuario " << users[userIndex].name << "tentou devolver o item " << items[itemIndex].name << " que foi pego emprestado por outro usuario \n\n";
+            return;
+        }
+        
+        items[itemIndex].responsibleId = "0";
+        items[itemIndex].status = AVAILABLE;
+        cout << "Sucesso: item " << items[itemIndex].name << "devolvido com sucesso por" << users[userIndex].name << "\n\n";
     }
-}
 };
 
 int main() {
@@ -164,12 +193,13 @@ int main() {
     library.items = items;
     library.users = users;
     
+    library.listUsers();
+    cout << "\n\n";
+    library.listItems();
     
     library.lendItem("002", "100", 20);
     library.lendItem("003", "100", 20); // Já emprestado
     library.lendItem("003", "101", 20); // Emprestando outra cópia
-
-
 
     library.listUsers();
     cout << "\n\n";
